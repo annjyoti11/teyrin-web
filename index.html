@@ -18,19 +18,19 @@ body{min-height:100svh;overflow:hidden}.stage{position:relative;min-height:100sv
 .wordmark{display:block;width:min(345px,60vw);height:auto;margin:0 auto;opacity:0;transform:translateY(5px);animation:reveal 1.5s ease .75s forwards}
 .tag{margin-top:9px;font-size:clamp(8px,.9vw,10px);font-weight:500;letter-spacing:.46em;margin-right:-.46em;color:#a86743;text-transform:uppercase;opacity:0;animation:reveal 1.5s ease 1.1s forwards}
 .promise{margin:clamp(44px,6.5vh,64px) auto 0;max-width:610px;font-size:clamp(16px,1.55vw,19px);font-weight:300;line-height:1.55;letter-spacing:.015em;color:#c7c7c3;opacity:0;transform:translateY(7px);animation:reveal 1.8s ease 1.75s forwards}
-.state{position:fixed;z-index:2;bottom:max(26px,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);width:100%;text-align:center;font-size:9px;letter-spacing:.38em;margin-right:-.38em;color:#6d4a37;text-transform:uppercase;opacity:0;transition:opacity 2.4s ease}
-.state.visible{opacity:.62}@keyframes reveal{to{opacity:1;transform:none}}
+.state{position:fixed;z-index:2;bottom:max(26px,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);width:100%;text-align:center;font-size:9px;letter-spacing:.38em;margin-right:-.38em;color:#aaa7a2;text-transform:uppercase;opacity:0;transition:opacity 3.2s ease;filter:drop-shadow(0 0 10px rgba(190,112,65,.08))}
+.state.visible{opacity:.72}@keyframes reveal{to{opacity:1;transform:none}}
 @media(max-width:600px){.hero{transform:translateY(-3vh)}.mark-wrap{width:min(188px,49vw)}.wordmark{width:min(300px,76vw)}.tag{font-size:8px;letter-spacing:.36em;margin-right:-.36em}.promise{max-width:330px;margin-top:48px;font-size:16px;line-height:1.55}.state{font-size:8px;letter-spacing:.28em;margin-right:-.28em}}@media(max-height:650px){.mark-wrap{width:min(180px,38vw);margin-bottom:14px}.promise{margin-top:30px}.state{bottom:14px}}
-@media(prefers-reduced-motion:reduce){.trace{display:none}.mark-wrap,.wordmark,.tag,.promise{animation:none;opacity:1;transform:none}.state{transition:none}}
+.state i{display:block;width:min(360px,44vw);height:1px;margin:13px auto 0;background:linear-gradient(90deg,transparent,rgba(168,103,67,.12) 36%,rgba(222,151,105,.8) 50%,rgba(168,103,67,.12) 64%,transparent);box-shadow:0 0 10px rgba(202,122,73,.32);transform:scaleX(.18);opacity:0;transition:transform 3.4s ease,opacity 3.4s ease}.state.visible i{transform:scaleX(1);opacity:.72}@media(prefers-reduced-motion:reduce){.trace{display:none}.mark-wrap,.wordmark,.tag,.promise{animation:none;opacity:1;transform:none}.state{transition:none}}
 </style>
 </head>
 <body><main class="stage"><div class="grain"></div><section class="hero" aria-label="TEYRIN">
 <div class="mark-wrap"><img class="mark" alt="TEYRIN symbol" src="teyrin-symbol.png"><div class="trace" aria-hidden="true"></div></div>
 <img class="wordmark" src="teyrin-wordmark-light.png" alt="TEYRIN"><div class="tag">Ideas, Engineered.</div>
 <p class="promise">We’re building what comes before the problem.</p></section>
-<div class="state" aria-live="off">Thought, becoming system.</div></main>
+<div class="state" aria-live="off"><span>Thought, becoming system.</span><i aria-hidden="true"></i></div></main>
 <script>
 (()=>{const trace=document.querySelector('.trace'),state=document.querySelector('.state');if(matchMedia('(prefers-reduced-motion: reduce)').matches){state.classList.add('visible');return}
-let count=0;function pulse(){trace.classList.remove('live');void trace.offsetWidth;trace.classList.add('live');count++;if(count===1)setTimeout(()=>state.classList.add('visible'),1500);setTimeout(()=>state.classList.remove('visible'),10500);setTimeout(pulse,15000+Math.random()*18000)}
+let count=0;function pulse(){trace.classList.remove('live');void trace.offsetWidth;trace.classList.add('live');count++;if(count===1)setTimeout(()=>state.classList.add('visible'),1500);setTimeout(()=>state.classList.remove('visible'),12000);setTimeout(pulse,15000+Math.random()*18000)}
 setTimeout(pulse,6500+Math.random()*4500)})();
 </script></body></html>
