@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TEYRIN — Ideas, Engineered.</title>
+<meta name="description" content="TEYRIN — Ideas, Engineered. Building what comes before the problem.">
+<meta name="theme-color" content="#050506">
+<style>
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:#050506;color:#f4f4f2;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+body{min-height:100svh;overflow:hidden}.stage{position:relative;min-height:100svh;display:grid;place-items:center;padding:32px 22px;background:radial-gradient(circle at 50% 38%,#111114 0,#080809 34%,#050506 70%)}
+.grain{position:absolute;inset:0;pointer-events:none;opacity:.025;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E")}
+.hero{position:relative;z-index:1;width:min(720px,92vw);text-align:center;transform:translateY(-1vh)}
+.mark-wrap{position:relative;width:min(290px,58vw);aspect-ratio:1.18;margin:0 auto 22px;display:grid;place-items:center}
+.mark{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 20px 40px rgba(0,0,0,.42))}
+.trace{position:absolute;inset:10% 4%;pointer-events:none;opacity:0;mix-blend-mode:screen;background:linear-gradient(108deg,transparent 38%,rgba(225,147,92,0) 43%,rgba(244,187,135,.92) 49%,rgba(194,103,55,.68) 52%,rgba(225,147,92,0) 58%,transparent 64%);filter:blur(1px);clip-path:polygon(49% 10%,96% 18%,67% 47%,55% 90%,43% 72%,48% 49%,11% 28%,8% 16%,42% 19%,52% 37%);transform:translateX(-55%)}
+.trace.live{animation:trace 2.35s cubic-bezier(.4,0,.2,1)}
+@keyframes trace{0%{opacity:0;transform:translateX(-55%)}20%{opacity:.14}48%{opacity:.7}78%{opacity:.12}100%{opacity:0;transform:translateX(55%)}}
+.word{font-size:clamp(34px,7vw,68px);font-weight:300;letter-spacing:.34em;margin-right:-.34em;color:#e7e7e5;line-height:1}
+.tag{margin-top:18px;font-size:clamp(10px,1.5vw,13px);letter-spacing:.48em;margin-right:-.48em;color:#a65f36;text-transform:uppercase}
+.promise{margin:clamp(48px,8vh,78px) auto 0;max-width:610px;font-size:clamp(17px,2.3vw,23px);font-weight:300;line-height:1.5;letter-spacing:.02em;color:#d9d9d6;opacity:0;transform:translateY(8px);animation:reveal 1.8s ease 2.3s forwards}
+.state{position:fixed;z-index:2;bottom:max(26px,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);width:100%;text-align:center;font-size:9px;letter-spacing:.38em;margin-right:-.38em;color:#6d4a37;text-transform:uppercase;opacity:0;transition:opacity 2.4s ease}
+.state.visible{opacity:.62}@keyframes reveal{to{opacity:1;transform:none}}
+@media(max-height:650px){.mark-wrap{width:min(210px,42vw);margin-bottom:14px}.promise{margin-top:30px}.state{bottom:14px}}
+@media(prefers-reduced-motion:reduce){.trace{display:none}.promise{animation:none;opacity:1;transform:none}.state{transition:none}}
+</style>
+</head>
+<body><main class="stage"><div class="grain"></div><section class="hero" aria-label="TEYRIN">
+<div class="mark-wrap"><img class="mark" alt="TEYRIN symbol" src="assets/teyrin-symbol.png"><div class="trace" aria-hidden="true"></div></div>
+<div class="word" aria-label="TEYRIN">TEYRIN</div><div class="tag">Ideas, Engineered.</div>
+<p class="promise">We’re building what comes before the problem.</p></section>
+<div class="state" aria-live="off">Thought, becoming system.</div></main>
+<script>
+(()=>{const trace=document.querySelector('.trace'),state=document.querySelector('.state');if(matchMedia('(prefers-reduced-motion: reduce)').matches){state.classList.add('visible');return}
+let count=0;function pulse(){trace.classList.remove('live');void trace.offsetWidth;trace.classList.add('live');count++;if(count===1)setTimeout(()=>state.classList.add('visible'),1500);setTimeout(()=>state.classList.remove('visible'),10500);setTimeout(pulse,15000+Math.random()*18000)}
+setTimeout(pulse,6500+Math.random()*4500)})();
+</script></body></html>
