@@ -31,6 +31,6 @@ body{min-height:100svh;overflow:hidden}.stage{position:relative;min-height:100sv
 <div class="state" aria-live="off"><span>Thought, becoming system.</span><i aria-hidden="true"></i></div></main>
 <script>
 (()=>{const trace=document.querySelector('.trace'),state=document.querySelector('.state');if(matchMedia('(prefers-reduced-motion: reduce)').matches){state.classList.add('visible');return}
-let count=0;function pulse(){trace.classList.remove('live');void trace.offsetWidth;trace.classList.add('live');count++;if(count===1)setTimeout(()=>state.classList.add('visible'),1500);setTimeout(()=>state.classList.remove('visible'),12000);setTimeout(pulse,15000+Math.random()*18000)}
+let count=0;function pulse(){trace.classList.remove('live');void trace.offsetWidth;trace.classList.add('live');count++;if(count===1)setTimeout(()=>state.classList.add('visible'),1500);setTimeout(pulse,15000+Math.random()*18000)}
 setTimeout(pulse,6500+Math.random()*4500)})();
 </script></body></html>
