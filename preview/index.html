@@ -65,6 +65,13 @@
   const count = panels.length;
   let ticking = false;
   let active = 0;
+  let scrollAnimation = 0;
+  let autoScrolling = false;
+  let scrollSettleTimer = 0;
+  let wheelAccumulator = 0;
+  let wheelResetTimer = 0;
+  let touchStartY = null;
+  let touchCurrentY = null;
 
   const clamp = (v,min,max) => Math.min(max,Math.max(min,v));
   const fade = (distance, hold, end) => {
@@ -73,9 +80,9 @@
     return 1 - (distance - hold) / (end - hold);
   };
   const textFade = distance => {
-    if (distance <= .14) return 1;
-    if (distance >= .38) return 0;
-    const t = (distance - .14) / .24;
+    if (distance <= .18) return 1;
+    if (distance >= .46) return 0;
+    const t = (distance - .18) / .28;
     const eased = t * t * (3 - 2 * t);
     return 1 - eased;
   };
@@ -84,6 +91,78 @@
     const top = story.getBoundingClientRect().top + scrollY;
     const travel = Math.max(1, story.offsetHeight - innerHeight);
     return {top,travel};
+  }
+
+  function chapterPosition(){
+    const {top,travel} = metrics();
+    return clamp(((scrollY - top) / travel) * (count - 1), 0, count - 1);
+  }
+
+  function chapterScrollY(index){
+    const {top,travel} = metrics();
+    return top + (clamp(index,0,count-1) / (count - 1)) * travel;
+  }
+
+  function goToChapter(index){
+    const targetIndex = clamp(Math.round(index),0,count-1);
+    const targetY = chapterScrollY(targetIndex);
+
+    cancelAnimationFrame(scrollAnimation);
+    clearTimeout(scrollSettleTimer);
+
+    if (reduce){
+      autoScrolling = true;
+      window.scrollTo(0,targetY);
+      active = targetIndex;
+      render();
+      autoScrolling = false;
+      return;
+    }
+
+    const startY = scrollY;
+    const distance = targetY - startY;
+    if (Math.abs(distance) < 2){
+      active = targetIndex;
+      render();
+      return;
+    }
+
+    const startedAt = performance.now();
+    const duration = 680;
+    autoScrolling = true;
+
+    const animate = now => {
+      const t = clamp((now - startedAt) / duration,0,1);
+      const eased = t < .5
+        ? 4 * t * t * t
+        : 1 - Math.pow(-2 * t + 2,3) / 2;
+      window.scrollTo(0,startY + distance * eased);
+      requestRender();
+
+      if (t < 1){
+        scrollAnimation = requestAnimationFrame(animate);
+      } else {
+        window.scrollTo(0,targetY);
+        active = targetIndex;
+        autoScrolling = false;
+        render();
+      }
+    };
+
+    scrollAnimation = requestAnimationFrame(animate);
+  }
+
+  function moveChapter(direction){
+    if (autoScrolling) return;
+    const current = Math.round(chapterPosition());
+    const target = clamp(current + direction,0,count-1);
+    if (target !== current) goToChapter(target);
+    else goToChapter(current);
+  }
+
+  function storyIsActive(){
+    const {top,travel} = metrics();
+    return scrollY >= top - 2 && scrollY <= top + travel + 2;
   }
 
   function render(){
@@ -159,9 +238,7 @@
     const index = Number(trigger.dataset.go);
     if (!Number.isFinite(index)) return;
     e.preventDefault();
-    const {top,travel} = metrics();
-    const y = top + (index / (count - 1)) * travel;
-    scrollTo({top:y,behavior:reduce?'auto':'smooth'});
+    goToChapter(index);
   });
 
   if (ideaForm){
@@ -222,7 +299,69 @@
     if (e.key === 'Escape' && ideaRoom.classList.contains('open')) closeIdeaRoom();
   });
 
-  addEventListener('scroll', requestRender, {passive:true});
+  addEventListener('wheel', e => {
+    if (ideaRoom.classList.contains('open') || !storyIsActive()) return;
+    if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;
+
+    e.preventDefault();
+    if (autoScrolling) return;
+
+    wheelAccumulator += e.deltaY;
+    clearTimeout(wheelResetTimer);
+    wheelResetTimer = setTimeout(() => { wheelAccumulator = 0; }, 120);
+
+    if (Math.abs(wheelAccumulator) >= 12){
+      const direction = wheelAccumulator > 0 ? 1 : -1;
+      wheelAccumulator = 0;
+      moveChapter(direction);
+    }
+  }, {passive:false});
+
+  addEventListener('touchstart', e => {
+    if (ideaRoom.classList.contains('open') || !storyIsActive() || !e.touches.length) return;
+    touchStartY = e.touches[0].clientY;
+    touchCurrentY = touchStartY;
+  }, {passive:true});
+
+  addEventListener('touchmove', e => {
+    if (touchStartY === null || ideaRoom.classList.contains('open') || !e.touches.length) return;
+    touchCurrentY = e.touches[0].clientY;
+    if (Math.abs(touchCurrentY - touchStartY) > 5) e.preventDefault();
+  }, {passive:false});
+
+  addEventListener('touchend', () => {
+    if (touchStartY === null) return;
+    const delta = touchStartY - (touchCurrentY === null ? touchStartY : touchCurrentY);
+    touchStartY = null;
+    touchCurrentY = null;
+    if (Math.abs(delta) >= 24) moveChapter(delta > 0 ? 1 : -1);
+  }, {passive:true});
+
+  document.addEventListener('keydown', e => {
+    if (ideaRoom.classList.contains('open') || !storyIsActive()) return;
+    const tag = document.activeElement && document.activeElement.tagName;
+    if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+
+    if (e.key === 'ArrowDown' || e.key === 'PageDown' || e.key === ' '){
+      e.preventDefault();
+      moveChapter(1);
+    } else if (e.key === 'ArrowUp' || e.key === 'PageUp'){
+      e.preventDefault();
+      moveChapter(-1);
+    }
+  });
+
+  addEventListener('scroll', () => {
+    requestRender();
+    if (autoScrolling || ideaRoom.classList.contains('open')) return;
+
+    clearTimeout(scrollSettleTimer);
+    scrollSettleTimer = setTimeout(() => {
+      if (!storyIsActive() || autoScrolling) return;
+      goToChapter(Math.round(chapterPosition()));
+    }, 110);
+  }, {passive:true});
+
   addEventListener('resize', requestRender);
   render();
 
