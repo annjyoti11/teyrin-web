@@ -109,6 +109,7 @@
 
     cancelAnimationFrame(scrollAnimation);
     clearTimeout(scrollSettleTimer);
+    autoScrolling = false;
 
     if (reduce){
       autoScrolling = true;
@@ -306,7 +307,12 @@
     e.preventDefault();
     if (autoScrolling) return;
 
-    wheelAccumulator += e.deltaY;
+    const wheelDelta = e.deltaMode === 1
+      ? e.deltaY * 16
+      : e.deltaMode === 2
+        ? e.deltaY * innerHeight
+        : e.deltaY;
+    wheelAccumulator += wheelDelta;
     clearTimeout(wheelResetTimer);
     wheelResetTimer = setTimeout(() => { wheelAccumulator = 0; }, 120);
 
